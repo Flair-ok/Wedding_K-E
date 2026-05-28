@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
 
         // URL скрипта Google Apps Script
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbz0vztqty7-HhXaOIsY1RIn40D46cEPGwLUo6cPyUPEt0qXRrokQ6a44taV7VzYmAbAvQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwql8y-IO3delWBlQ_74pOLi8qDlbHW7uffIrTmxLLZ3k25frrMdSeL1Snp8XaKX1XJ4Q/exec';
 
         fetch(scriptURL, {
             method: 'POST',
