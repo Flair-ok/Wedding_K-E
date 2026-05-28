@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Собираем напитки основного гостя
+        // Собираем данные основного гостя
         const mainDrinkCheckboxes = document.querySelectorAll('input[name="main-drink"]:checked');
         const mainDrinks = Array.from(mainDrinkCheckboxes).map(cb => cb.value).join(', ') || 'Не пью/За рулём';
 
@@ -133,33 +133,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const allGuests = [mainGuest, ...extraGuests];
 
+        // Теперь отправляем каждого гостя отдельным запросом как обычную форму
         submitBtn.textContent = 'Отправляем...';
         submitBtn.disabled = true;
 
-        // URL скрипта Google Apps Script
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwql8y-IO3delWBlQ_74pOLi8qDlbHW7uffIrTmxLLZ3k25frrMdSeL1Snp8XaKX1XJ4Q/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxQ1-yoJktjIVc4CXGt7M5BpIixQNtR557CxwxJMGY3IcjJezneVv7E6priXsO0kCQNZA/exec';
 
-        fetch(scriptURL, {
-            method: 'POST',
-            body: JSON.stringify({ guests: allGuests }),
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result === 'success') {
+        // Функция для отправки одного гостя
+        function sendGuest(guest) {
+            const formData = new URLSearchParams();
+            formData.append('name', guest.name);
+            formData.append('isMain', guest.isMain);
+            formData.append('attendance', guest.attendance);
+            formData.append('drink', guest.drink);
+            formData.append('wishes', guest.wishes);
+
+            return fetch(scriptURL, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result !== 'success') {
+                    throw new Error('Ошибка сервера');
+                }
+            });
+        }
+
+        // Отправляем всех гостей по очереди
+        Promise.all(allGuests.map(guest => sendGuest(guest)))
+            .then(() => {
                 form.style.display = 'none';
                 successMessage.style.display = 'block';
-            } else {
-                alert('Что-то пошло не так. Попробуйте ещё раз.');
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка соединения. Проверьте интернет.');
                 submitBtn.textContent = 'Отправить';
                 submitBtn.disabled = false;
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            alert('Ошибка соединения. Проверьте интернет.');
-            submitBtn.textContent = 'Отправить';
-            submitBtn.disabled = false;
-        });
+            });
     });
 });
