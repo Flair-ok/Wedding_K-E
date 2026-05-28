@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Свадьба Ксении и Егора</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <p class="pre-title">🌿 С радостью приглашаем вас 🌿</p>
+                <h1>Ксения & Егор</h1>
+                <div class="date-location">
+                    <p class="date">📅 25 июля 2026 года</p>
+                    <p class="location">📍 Банкетный зал Grand Hall | Саранск</p>
+                    <p class="time">🕒 Сбор гостей в 14:30</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="invitation-text">
+            <p>Дорогие гости!</p>
+            <p>Мы трепетно ждём этот день и будем счастливы видеть вас среди самых близких. Пожалуйста, подтвердите своё присутствие до 1 мая, заполнив небольшую анкету. Если вы планируете прийти не один — укажите всех гостей, и мы учтём пожелания каждого.</p>
+        </div>
+
+        <div class="form-section" id="rsvp-form-section">
+            <h2>💌 Анкета гостя 💌</h2>
+            <form id="rsvp-form">
+                <!-- Основной гость -->
+                <div class="form-group">
+                    <label for="guest-name">✨ Ваше имя и фамилия *</label>
+                    <input type="text" id="guest-name" placeholder="Например, Анна Кузнецова" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="guests-count">👥 Сколько вас будет (включая вас)?</label>
+                    <select id="guests-count">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+
+                <!-- Динамические поля для дополнительных гостей -->
+                <div id="extra-guests-container"></div>
+
+                <div class="form-group">
+                    <label>💖 Сможете присутствовать? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="attendance" value="Да" required>
+                            <span class="radio-custom"></span>
+                            Обязательно буду!
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="attendance" value="Нет">
+                            <span class="radio-custom"></span>
+                            К сожалению, не смогу
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>🥂 Что предпочитаете пить? (можно выбрать несколько, но лучше не более двух)</label>
+                    <div class="checkbox-group" id="main-drink-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="main-drink" value="Не пью/За рулём">
+                        <span class="checkbox-custom"></span>
+                        Не пью/За рулём
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="main-drink" value="Вино">
+                        <span class="checkbox-custom"></span>
+                        Вино
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="main-drink" value="Шампанское">
+                        <span class="checkbox-custom"></span>
+                        Шампанское
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="main-drink" value="Водка">
+                        <span class="checkbox-custom"></span>
+                        Водка
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="main-drink" value="Самогон">
+                        <span class="checkbox-custom"></span>
+                        Самогон
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="main-drink" value="Коньяк">
+                        <span class="checkbox-custom"></span>
+                        Коньяк
+                    </label>
+    </div>
+</div>
+
+                <div class="form-group">
+                    <label for="wishes">💬 Ваши пожелания молодожёнам</label>
+                    <textarea id="wishes" rows="3" placeholder="Нам будет очень приятно..."></textarea>
+                </div>
+
+                <button type="submit" id="submit-btn">💌 Отправить 💌</button>
+                <p class="design-note">Дизайн сайта может немного отличаться в зависимости от того, на каком устройстве вы смотрите данный сайт — компьютер/телефон.</p>
+            </form>
+            <div class="success-message" id="success-message" style="display: none;">
+                <div class="success-icon">🌸</div>
+                <p>Спасибо! Ваш ответ принят.</p>
+                <p>Ждём встречи на празднике!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
