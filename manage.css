@@ -7,7 +7,7 @@ body {
     padding: 20px;
 }
 
-.container { max-width: 1200px; margin: 0 auto; }
+.container { max-width: 1400px; margin: 0 auto; }   /* расширили контейнер */
 
 h1 {
     font-family: 'Cormorant Garamond', serif;
@@ -144,16 +144,17 @@ h1 {
 #seating-plan h3 { color: #b17d7a; margin-bottom: 20px; }
 
 #tables-container {
-    display: flex; flex-wrap: wrap; gap: 40px; justify-content: center;
+    display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;  /* увеличенный gap */
 }
 
 .table-block {
-    background: #333; border-radius: 20px; padding: 20px;
-    flex: 0 1 400px;             /* два блока в ряд при ширине >800px */
+    background: #333; border-radius: 20px; padding: 25px;
+    flex: 0 1 480px;            /* шире, чтобы два блока в ряд помещались */
     margin-bottom: 10px;
 }
 .table-block h4 {
     text-align: center; color: #b17d7a; margin-bottom: 15px;
+    font-size: 1.2rem;
 }
 .rect-table {
     border: 2px solid #b17d7a;
@@ -164,19 +165,23 @@ h1 {
 .round-table {
     border: 2px solid #b17d7a; border-radius: 50%;
     background: #3a3a3a;
-    width: 300px; height: 300px;
+    width: 360px; height: 360px;   /* значительно увеличены */
     display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-    padding: 20px; margin: 0 auto;
-    overflow: hidden;            /* чтобы слоты не вылезали за пределы круга */
+    padding: 30px;                 /* больше внутреннее пространство */
+    margin: 0 auto;
+    overflow: hidden;              /* слоты не вылезают за круг */
 }
 .guest-slot {
-    background: #444; border-radius: 8px; padding: 6px 10px;
-    font-size: 0.75rem; cursor: pointer;
+    background: #444; border-radius: 8px;
+    padding: 8px 12px;             /* просторнее */
+    font-size: 0.85rem;
+    cursor: pointer;
     border: 1px dashed #777;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 140px;            /* обрезаем длинные имена */
+    max-width: 170px;              /* больше места под текст */
+    line-height: 1.2;
 }
 .guest-slot.occupied {
     background: #b17d7a; color: white; border: none;
