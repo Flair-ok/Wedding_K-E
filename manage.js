@@ -4,15 +4,23 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1vvB_fHGMh_SVwJjdH
 
 let guests = [];
 
-// Загрузка гостей
+// Загрузка гостей (с credentials: 'omit')
 async function loadGuests() {
     try {
-        const resp = await fetch(`${SCRIPT_URL}?key=${SECRET_KEY}`);
+        const resp = await fetch(`${SCRIPT_URL}?key=${SECRET_KEY}`, {
+            method: 'GET',
+            credentials: 'omit',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+        if (!resp.ok) {
+            const text = await resp.text();
+            throw new Error(`HTTP ${resp.status}: ${text}`);
+        }
         const data = await resp.json();
         if (Array.isArray(data)) {
             guests = data;
         } else {
-            console.error('Неверный формат данных');
+            console.error('Неверный формат данных', data);
         }
     } catch (err) {
         console.error(err);
@@ -120,7 +128,12 @@ async function addGuest() {
     body.append('age', age);
     body.append('table', table);
     try {
-        const resp = await fetch(SCRIPT_URL, { method: 'POST', body });
+        const resp = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body,
+            credentials: 'omit',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
         const data = await resp.json();
         if (data.result === 'success') {
             document.getElementById('newFio').value = '';
@@ -142,7 +155,12 @@ async function updateGuest(id, row) {
         body.append(el.dataset.field, el.value);
     });
     try {
-        const resp = await fetch(SCRIPT_URL, { method: 'POST', body });
+        const resp = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body,
+            credentials: 'omit',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
         const data = await resp.json();
         if (data.result === 'success') {
             await loadGuests();
@@ -158,7 +176,12 @@ async function deleteGuest(id) {
     body.append('action', 'delete');
     body.append('id', id);
     try {
-        const resp = await fetch(SCRIPT_URL, { method: 'POST', body });
+        const resp = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body,
+            credentials: 'omit',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
         const data = await resp.json();
         if (data.result === 'success') {
             await loadGuests();
