@@ -67,7 +67,7 @@ h1 {
 }
 .flex-2 { flex: 2; }
 .table-input {
-    width: 130px; flex: none; /* поле Стол компактное */
+    width: 130px; flex: none;
 }
 
 /* Кнопка "Добавить" */
@@ -78,7 +78,7 @@ h1 {
     font-size: 1rem; font-weight: 600; letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(177, 125, 122, 0.4);
-    margin-left: auto; /* прижать к правому краю, если есть flex */
+    margin-left: auto;
 }
 .btn-add:hover {
     background: linear-gradient(135deg, #c4817c, #9f6b68);
@@ -134,3 +134,67 @@ h1 {
     background: #3a3a3a; padding: 8px 15px; border-radius: 15px;
     font-size: 0.9rem; color: #f0f0f0;
 }
+
+/* ===================== РАССАДКА ===================== */
+#seating-plan {
+    margin-top: 30px;
+    background: #2a2a2a; border-radius: 20px; padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+#seating-plan h3 { color: #b17d7a; margin-bottom: 20px; }
+
+#tables-container {
+    display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;
+}
+
+.table-block {
+    background: #333; border-radius: 20px; padding: 15px;
+    min-width: 200px; max-width: 250px;
+}
+.table-block h4 {
+    text-align: center; color: #b17d7a; margin-bottom: 10px;
+}
+.rect-table {
+    border: 2px solid #b17d7a;
+    background: #3a3a3a;
+    min-height: 60px; display: flex; flex-direction: column; gap: 5px;
+    padding: 5px; border-radius: 10px;
+}
+.round-table {
+    border: 2px solid #b17d7a; border-radius: 50%;
+    background: #3a3a3a;
+    width: 180px; height: 180px;
+    position: relative;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    margin: 0 auto;
+}
+.round-table .guest-slot {
+    position: absolute;
+    width: 80px; text-align: center;
+}
+/* Расставим 10 слотов по кругу с помощью JavaScript, поэтому в CSS только базовые стили */
+.guest-slot {
+    background: #444; border-radius: 8px; padding: 4px 6px;
+    font-size: 0.8rem; cursor: pointer;
+    border: 1px dashed #777;
+}
+.guest-slot.occupied {
+    background: #b17d7a; color: white; border: none;
+}
+.guest-slot.drag-over {
+    border: 2px dashed #fff;
+}
+
+.unassigned-guests {
+    background: #333; border-radius: 20px; padding: 15px;
+    flex-basis: 100%;
+}
+.unassigned-guests h4 { color: #b17d7a; margin-bottom: 10px; }
+.unassigned-list {
+    display: flex; flex-wrap: wrap; gap: 10px;
+}
+.unassigned-guest {
+    background: #555; padding: 6px 12px; border-radius: 15px;
+    cursor: grab; font-size: 0.9rem;
+}
+.unassigned-guest.dragging { opacity: 0.5; }
