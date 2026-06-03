@@ -1,6 +1,8 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH1djTYhHYEXelXKH_SVK_GSnnrO0WGkWwsn4fzj4xJbSw91KeOHUbnnNHRbhHHxciLg/exec';
 
 let guests = [];
+let sortColumn = null;   // текущий столбец сортировки
+let sortAsc = true;      // направление сортировки
 
 // ===================== ЗАГРУЗКА ДАННЫХ =====================
 async function loadGuests() {
@@ -29,22 +31,52 @@ function filteredGuests() {
 
   return guests.filter(g => {
     if (cat && g.category !== cat) return false;
-    if (age && g.age !== age) return false;   // точное совпадение категории
+    if (age && g.age !== age) return false;
     if (drink && !g.drinks.split(',').map(d => d.trim()).includes(drink)) return false;
     if (table && !g.table.toLowerCase().includes(table.toLowerCase())) return false;
     return true;
   });
 }
 
+// ===================== СОРТИРОВКА =====================
+function sortGuests(arr) {
+  if (!sortColumn) return arr;
+  const col = sortColumn;
+
+  const getSortValue = (g) => {
+    switch (col) {
+      case 'fio': return (g.fio || '').toLowerCase();
+      case 'category': return g.category || '';
+      case 'drinks': return g.drinks || '';
+      case 'age':
+        const ageOrder = { '<18': 1, '18-30': 2, '30-50': 3, '>50': 4 };
+        return ageOrder[g.age] || 0;
+      case 'table':
+        const num = parseInt((g.table || '').replace(/[^0-9]/g, ''));
+        return isNaN(num) ? 0 : num;
+      default: return '';
+    }
+  };
+
+  return arr.sort((a, b) => {
+    const aVal = getSortValue(a);
+    const bVal = getSortValue(b);
+    if (aVal < bVal) return sortAsc ? -1 : 1;
+    if (aVal > bVal) return sortAsc ? 1 : -1;
+    return 0;
+  });
+}
+
 // ===================== ОТРИСОВКА ТАБЛИЦЫ =====================
 function renderTable() {
   const filtered = filteredGuests();
+  const sorted = sortGuests(filtered);
   const tbody = document.querySelector('#guestTable tbody');
   if (!tbody) return;
 
   const ageOptions = ['<18', '18-30', '30-50', '>50'];
 
-  tbody.innerHTML = filtered.map(g => {
+  tbody.innerHTML = sorted.map(g => {
     const ageSelect = ageOptions.map(opt =>
       `<option value="${opt}" ${g.age === opt ? 'selected' : ''}>${opt}</option>`
     ).join('');
@@ -73,7 +105,8 @@ function renderTable() {
   }).join('');
 
   updateDrinkStats(filtered);
-  fillDrinkFilter();   // статический список
+  fillDrinkFilter();
+  updateSortArrows();
 }
 
 function escapeHtml(str) {
@@ -115,6 +148,48 @@ function updateDrinkStats(filtered) {
     <div style="margin-top:10px;"><strong>Отфильтрованные (${filtered.length})</strong></div>
     <div class="stat-row">${Object.entries(filteredStats).map(([k, v]) => `<span class="stat-item">${k}: ${v}</span>`).join('')}</div>`;
 }
+
+// ===================== ОБРАБОТЧИК СОРТИРОВКИ ПО ЗАГОЛОВКАМ =====================
+function setupSortListeners() {
+  document.querySelectorAll('.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      if (sortColumn === col) {
+        sortAsc = !sortAsc;   // меняем направление
+      } else {
+        sortColumn = col;
+        sortAsc = true;       // по умолчанию по возрастанию
+      }
+      renderTable();
+    });
+  });
+}
+
+function updateSortArrows() {
+  document.querySelectorAll('.sortable').forEach(th => {
+    const arrow = th.querySelector('.sort-arrow');
+    if (!arrow) return;
+    if (th.dataset.sort === sortColumn) {
+      arrow.textContent = sortAsc ? '🔼' : '🔽';
+    } else {
+      arrow.textContent = '';
+    }
+  });
+}
+
+// ===================== СБРОС ФИЛЬТРА НАПИТКОВ =====================
+document.addEventListener('DOMContentLoaded', function() {
+  const resetBtn = document.getElementById('resetDrinkBtn');
+  const drinkSelect = document.getElementById('filterDrink');
+  if (resetBtn && drinkSelect) {
+    resetBtn.addEventListener('click', function() {
+      drinkSelect.value = '';
+      renderTable();
+    });
+  }
+  // Также при обычном изменении селекта
+  drinkSelect?.addEventListener('change', renderTable);
+});
 
 // ===================== ДОБАВЛЕНИЕ ГОСТЯ =====================
 async function addGuest() {
@@ -211,8 +286,8 @@ async function deleteGuest(id) {
 // ===================== ИНИЦИАЛИЗАЦИЯ =====================
 (async function init() {
   await loadGuests();
+  setupSortListeners();
   document.getElementById('filterCategory').addEventListener('change', renderTable);
   document.getElementById('filterAge').addEventListener('change', renderTable);
-  document.getElementById('filterDrink').addEventListener('change', renderTable);
   document.getElementById('filterTable').addEventListener('input', renderTable);
 })();
