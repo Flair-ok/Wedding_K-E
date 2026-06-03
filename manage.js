@@ -1,12 +1,21 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyA5H2hOA_D9zlqv0KBQCzcokfBfWS70BCuwFmoxGbF1PKGFzd3eMw_Jmcpf3jYDiHSeg/exec';
-const SECRET_KEY = '12345'; // ← замени на тот же, что в Apps Script
 
 let guests = [];
 
 async function loadGuests() {
-  const resp = await fetch(`${SCRIPT_URL}?key=${encodeURIComponent(SECRET_KEY)}`);
-  guests = await resp.json();
-  renderTable();
+  try {
+    const resp = await fetch(SCRIPT_URL, { method: 'GET', credentials: 'omit' });
+    const data = await resp.json();
+    if (Array.isArray(data)) {
+      guests = data;
+      renderTable();
+    } else {
+      console.error('Неверный формат:', data);
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки:', err);
+    alert('Не удалось загрузить данные. Проверьте консоль.');
+  }
 }
 
 function renderTable() {
@@ -14,13 +23,17 @@ function renderTable() {
   if (!tbody) return;
   tbody.innerHTML = guests.map(g => `
     <tr>
-      <td>${g.fio}</td>
-      <td>${g.category}</td>
-      <td>${g.drinks}</td>
-      <td>${g.age}</td>
-      <td>${g.table}</td>
+      <td>${escapeHtml(g.fio)}</td>
+      <td>${escapeHtml(g.category)}</td>
+      <td>${escapeHtml(g.drinks)}</td>
+      <td>${escapeHtml(g.age)}</td>
+      <td>${escapeHtml(g.table)}</td>
     </tr>
   `).join('');
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 }
 
 loadGuests();
