@@ -19,9 +19,16 @@
                 <option>Семья Невесты</option>
                 <option>Друзья</option>
             </select>
-            <input type="text" id="filterAge" placeholder="Возраст (например, 30)">
+            <select id="filterAge">
+                <option value="">Все возраста</option>
+                <option value="<18">&lt;18</option>
+                <option value="18-30">18-30</option>
+                <option value="30-50">30-50</option>
+                <option value=">50">&gt;50</option>
+            </select>
             <select id="filterDrink">
                 <option value="">Все напитки</option>
+                <!-- Заполняется из JS статическим списком -->
             </select>
             <input type="text" id="filterTable" placeholder="Стол (например, 5)">
             <button class="btn" onclick="renderTable()">🔄 Обновить</button>
@@ -30,7 +37,10 @@
         <div class="add-form">
             <h3>Добавить гостя</h3>
             <div class="form-row">
-                <label>ФИО:</label><input type="text" id="newFio" placeholder="Иван Петров" style="flex:2;">
+                <label>ФИО:</label>
+                <input type="text" id="newFio" placeholder="Иван Петров" class="flex-2">
+            </div>
+            <div class="form-row">
                 <label>Категория:</label>
                 <select id="newCategory">
                     <option>Семья Жениха</option>
@@ -39,8 +49,17 @@
                 </select>
             </div>
             <div class="form-row">
+                <label>Возраст:</label>
+                <select id="newAge">
+                    <option value="<18">&lt;18</option>
+                    <option value="18-30" selected>18-30</option>
+                    <option value="30-50">30-50</option>
+                    <option value=">50">&gt;50</option>
+                </select>
+            </div>
+            <div class="form-row">
                 <label>Напитки:</label>
-                <div style="display:flex; gap:5px; flex-wrap:wrap;" id="newDrinksCheck">
+                <div class="checkbox-group" id="newDrinksCheck">
                     <label><input type="checkbox" value="Не пью"> Не пью</label>
                     <label><input type="checkbox" value="Сок"> Сок</label>
                     <label><input type="checkbox" value="Лимонад"> Лимонад</label>
@@ -52,8 +71,8 @@
                 </div>
             </div>
             <div class="form-row">
-                <label>Возраст:</label><input type="text" id="newAge" placeholder="30" style="width:80px;">
-                <label>Стол:</label><input type="text" id="newTable" placeholder="Стол - 5" style="width:120px;">
+                <label>Стол:</label>
+                <input type="text" id="newTable" placeholder="Стол - 5" class="flex-2">
                 <button class="btn" onclick="addGuest()">Добавить</button>
             </div>
         </div>
