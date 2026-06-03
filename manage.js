@@ -1,8 +1,8 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH1djTYhHYEXelXKH_SVK_GSnnrO0WGkWwsn4fzj4xJbSw91KeOHUbnnNHRbhHHxciLg/exec';
 
 let guests = [];
-let sortColumn = null;   // активный столбец сортировки или null
-let sortAsc = true;      // направление сортировки (по умолчанию не важно, если sortColumn=null)
+let sortColumn = null;
+let sortAsc = true;
 
 // ===================== ЗАГРУЗКА ДАННЫХ =====================
 async function loadGuests() {
@@ -13,6 +13,7 @@ async function loadGuests() {
     if (Array.isArray(data)) {
       guests = data;
       renderTable();
+      renderSeatingPlan(); // отрисовываем рассадку при каждой загрузке
     } else {
       console.error('Неверный формат:', data);
     }
@@ -40,10 +41,9 @@ function filteredGuests() {
 
 // ===================== СОРТИРОВКА =====================
 function sortGuests(arr) {
-  if (!sortColumn) return arr; // без сортировки возвращаем как есть
+  if (!sortColumn) return arr;
 
   const col = sortColumn;
-
   const getSortValue = (g) => {
     switch (col) {
       case 'fio': return (g.fio || '').toLowerCase();
@@ -150,22 +150,15 @@ function updateDrinkStats(filtered) {
     <div class="stat-row">${Object.entries(filteredStats).map(([k, v]) => `<span class="stat-item">${k}: ${v}</span>`).join('')}</div>`;
 }
 
-// ===================== СОРТИРОВКА ПО ЗАГОЛОВКАМ (три состояния) =====================
+// ===================== СОРТИРОВКА ПО ЗАГОЛОВКАМ =====================
 function setupSortListeners() {
   document.querySelectorAll('.sortable').forEach(th => {
     th.addEventListener('click', () => {
       const col = th.dataset.sort;
       if (sortColumn === col) {
-        // Уже сортируем по этому столбцу
-        if (sortAsc) {
-          sortAsc = false;   // переключить на убывание
-        } else {
-          // было убывание → отключаем сортировку
-          sortColumn = null;
-          sortAsc = true;
-        }
+        if (sortAsc) { sortAsc = false; }
+        else { sortColumn = null; sortAsc = true; }
       } else {
-        // Новый столбец: включаем сортировку по возрастанию
         sortColumn = col;
         sortAsc = true;
       }
@@ -228,8 +221,7 @@ async function addGuest() {
       document.getElementById('newFio').value = '';
       document.getElementById('newTable').value = '';
       document.querySelectorAll('#newDrinksCheck input').forEach(cb => cb.checked = false);
-      await loadGuests();
-      renderTable();
+      await loadGuests(); // обновит и рассадку
     } else {
       alert(data.message || 'Ошибка при добавлении');
     }
@@ -255,8 +247,7 @@ async function updateGuest(id, row) {
     });
     const data = await resp.json();
     if (data.result === 'success') {
-      await loadGuests();
-      renderTable();
+      await loadGuests(); // обновит рассадку
     } else {
       alert(data.message || 'Ошибка при обновлении');
     }
@@ -282,13 +273,217 @@ async function deleteGuest(id) {
     const data = await resp.json();
     if (data.result === 'success') {
       await loadGuests();
-      renderTable();
     } else {
       alert(data.message || 'Ошибка при удалении');
     }
   } catch (err) {
     alert('Ошибка соединения');
   }
+}
+
+// ===================== РАССАДКА ГОСТЕЙ =====================
+function renderSeatingPlan() {
+  const container = document.getElementById('tables-container');
+  if (!container) return;
+
+  // Определяем столы
+  const tables = [
+    { id: 'rect', label: 'Молодожёны', type: 'rectangle', capacity: 2, number: 1 }, // номер 1 зарезервирован для прямоугольного
+    { id: 'table2', label: 'Стол 2', type: 'round', capacity: 10, number: 2 },
+    { id: 'table3', label: 'Стол 3', type: 'round', capacity: 10, number: 3 },
+    { id: 'table4', label: 'Стол 4', type: 'round', capacity: 10, number: 4 },
+    { id: 'table5', label: 'Стол 5', type: 'round', capacity: 10, number: 5 },
+    { id: 'table6', label: 'Стол 6', type: 'round', capacity: 10, number: 6 },
+    { id: 'table7', label: 'Стол 7', type: 'round', capacity: 10, number: 7 },
+    { id: 'table8', label: 'Стол 8', type: 'round', capacity: 10, number: 8 }
+  ];
+
+  // Собираем гостей по столам
+  const tableGuests = {};
+  tables.forEach(t => tableGuests[t.id] = []);
+  const unassigned = [];
+
+  guests.forEach(guest => {
+    // Ищем номер стола из строки вида "Стол - X"
+    const match = (guest.table || '').match(/Стол\s*-\s*(\d+)/);
+    if (match) {
+      const num = parseInt(match[1]);
+      // Если это 1, помещаем на прямоугольный стол
+      if (num === 1) {
+        tableGuests['rect'].push(guest);
+        return;
+      }
+      // Ищем круглый стол с таким номером
+      const table = tables.find(t => t.number === num && t.type === 'round');
+      if (table) {
+        tableGuests[table.id].push(guest);
+      } else {
+        unassigned.push(guest);
+      }
+    } else {
+      unassigned.push(guest);
+    }
+  });
+
+  // Отрисовываем
+  let html = '<div style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">';
+  // Прямоугольный стол
+  html += renderRectangleTable('rect', tables[0], tableGuests['rect']);
+  // Круглые столы
+  tables.slice(1).forEach(t => {
+    html += renderRoundTable(t, tableGuests[t.id]);
+  });
+  html += '</div>';
+  // Неразмещённые гости
+  html += `<div class="unassigned-guests">
+    <h4>Неразмещённые гости (${unassigned.length})</h4>
+    <div class="unassigned-list" id="unassigned-list">`;
+  unassigned.forEach(g => {
+    html += `<div class="unassigned-guest" draggable="true" data-guest-id="${g.id}">${escapeHtml(g.fio)}</div>`;
+  });
+  html += `</div></div>`;
+
+  container.innerHTML = html;
+
+  // Делаем неразмещённых гостей перетаскиваемыми
+  setupDragAndDrop();
+}
+
+function renderRectangleTable(id, table, guestsList) {
+  const slots = [];
+  for (let i = 0; i < table.capacity; i++) {
+    const guest = guestsList[i] || null;
+    slots.push(`
+      <div class="guest-slot ${guest ? 'occupied' : ''}" 
+           data-table-id="${id}" data-slot="${i}" 
+           ${guest ? `data-guest-id="${guest.id}" draggable="true"` : ''}>
+        ${guest ? escapeHtml(guest.fio) : 'Пусто'}
+      </div>`);
+  }
+  return `
+    <div class="table-block">
+      <h4>${table.label}</h4>
+      <div class="rect-table" data-table-id="${id}">
+        ${slots.join('')}
+      </div>
+    </div>`;
+}
+
+function renderRoundTable(table, guestsList) {
+  const slots = [];
+  for (let i = 0; i < table.capacity; i++) {
+    const guest = guestsList[i] || null;
+    // Позиционирование по кругу зададим позже через JS, пока просто слоты с data-атрибутами
+    slots.push(`
+      <div class="guest-slot ${guest ? 'occupied' : ''}" 
+           data-table-id="${table.id}" data-slot="${i}"
+           style="position: static; margin: 2px;"
+           ${guest ? `data-guest-id="${guest.id}" draggable="true"` : ''}>
+        ${guest ? escapeHtml(guest.fio.split(' ')[0]) : 'Свободно'}
+      </div>`);
+  }
+  return `
+    <div class="table-block">
+      <h4>${table.label}</h4>
+      <div class="round-table" data-table-id="${table.id}" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 10px;">
+        ${slots.join('')}
+      </div>
+    </div>`;
+}
+
+// ===================== ПЕРЕТАСКИВАНИЕ ГОСТЕЙ =====================
+function setupDragAndDrop() {
+  // Все элементы с атрибутом draggable="true"
+  const draggables = document.querySelectorAll('[draggable="true"]');
+  const dropZones = document.querySelectorAll('.guest-slot');
+
+  draggables.forEach(el => {
+    el.addEventListener('dragstart', handleDragStart);
+    el.addEventListener('dragend', handleDragEnd);
+  });
+
+  dropZones.forEach(zone => {
+    zone.addEventListener('dragover', handleDragOver);
+    zone.addEventListener('dragleave', handleDragLeave);
+    zone.addEventListener('drop', handleDrop);
+  });
+}
+
+let draggedGuestId = null;
+
+function handleDragStart(e) {
+  draggedGuestId = this.dataset.guestId;
+  this.classList.add('dragging');
+  e.dataTransfer.setData('text/plain', draggedGuestId);
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  // Не сбрасываем draggedGuestId, он понадобится в drop
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  this.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+
+async function handleDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const targetSlot = this;
+  const targetTableId = targetSlot.dataset.tableId;
+  const targetSlotIndex = parseInt(targetSlot.dataset.slot);
+
+  if (!draggedGuestId) return;
+
+  // Нельзя бросить на уже занятый слот (если он не тот же гость?)
+  if (targetSlot.classList.contains('occupied') && targetSlot.dataset.guestId !== draggedGuestId) {
+    alert('Это место уже занято.');
+    return;
+  }
+
+  // Определяем новый стол по ID стола
+  let newTableValue = '';
+  if (targetTableId === 'rect') {
+    newTableValue = 'Стол - 1';
+  } else {
+    // Извлекаем номер из ID, например 'table2' -> 2
+    const num = targetTableId.replace('table', '');
+    newTableValue = `Стол - ${num}`;
+  }
+
+  // Обновляем гостя через API
+  const body = new URLSearchParams();
+  body.append('action', 'update');
+  body.append('id', draggedGuestId);
+  body.append('table', newTableValue); // отправляем только изменение стола
+
+  try {
+    const resp = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body,
+      credentials: 'omit',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+    const data = await resp.json();
+    if (data.result === 'success') {
+      await loadGuests(); // перезагрузит и рассадку
+    } else {
+      alert(data.message || 'Не удалось переместить гостя.');
+    }
+  } catch (err) {
+    alert('Ошибка соединения.');
+  }
+
+  // Сбрасываем перетаскиваемого
+  document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+  draggedGuestId = null;
 }
 
 // ===================== ИНИЦИАЛИЗАЦИЯ =====================
