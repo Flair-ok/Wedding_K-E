@@ -149,7 +149,7 @@ h1 {
 
 .table-block {
     background: #333; border-radius: 20px; padding: 25px;
-    flex: 0 1 480px;            /* шире, чтобы два блока в ряд помещались */
+    flex: 0 1 560px;            /* шире, чтобы два блока в ряд помещались */
     margin-bottom: 10px;
 }
 .table-block h4 {
@@ -165,22 +165,22 @@ h1 {
 .round-table {
     border: 2px solid #b17d7a; border-radius: 50%;
     background: #3a3a3a;
-    width: 360px; height: 360px;   /* значительно увеличены */
+    width: 400px; height: 400px;   /* значительно увеличены */
     display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-    padding: 30px;                 /* больше внутреннее пространство */
+    padding: 35px;                 /* больше внутреннее пространство */
     margin: 0 auto;
     overflow: hidden;              /* слоты не вылезают за круг */
 }
 .guest-slot {
     background: #444; border-radius: 8px;
     padding: 8px 12px;             /* просторнее */
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     cursor: pointer;
     border: 1px dashed #777;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 170px;              /* больше места под текст */
+    max-width: 190px;              /* больше места под текст */
     line-height: 1.2;
 }
 .guest-slot.occupied {
