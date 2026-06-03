@@ -66,6 +66,26 @@ h1 {
     font-family: inherit;
 }
 .flex-2 { flex: 2; }
+.table-input {
+    width: 130px; flex: none; /* поле Стол компактное */
+}
+
+/* Кнопка "Добавить" */
+.btn-add {
+    background: linear-gradient(135deg, #d4a9a5, #b17d7a);
+    border: none; color: white;
+    padding: 10px 28px; border-radius: 25px;
+    font-size: 1rem; font-weight: 600; letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(177, 125, 122, 0.4);
+    margin-left: auto; /* прижать к правому краю, если есть flex */
+}
+.btn-add:hover {
+    background: linear-gradient(135deg, #c4817c, #9f6b68);
+    box-shadow: 0 6px 16px rgba(177, 125, 122, 0.6);
+    transform: translateY(-1px);
+}
+
 .checkbox-group {
     display: flex; flex-wrap: wrap; gap: 8px;
 }
