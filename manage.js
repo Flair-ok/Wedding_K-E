@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/library/d/1ZUxii379xMHmnhJr6VJ3RT3KBUkKxPHKJ4Ume8vT_TT5Qk1dSjUCqWUK/5'; // ← вставь скопированный URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyA5H2hOA_D9zlqv0KBQCzcokfBfWS70BCuwFmoxGbF1PKGFzd3eMw_Jmcpf3jYDiHSeg/exec/exec';
 
 async function test() {
   try {
