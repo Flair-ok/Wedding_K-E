@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyA5H2hOA_D9zlqv0KBQCzcokfBfWS70BCuwFmoxGbF1PKGFzd3eMw_Jmcpf3jYDiHSeg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIj7wp9bqo-bqGpXWii5StnWWNKNsyn1b0wSEeFsyx9wLp1TuFb8ES-dUm9nswjK252g/exec';
 
 async function test() {
   try {
