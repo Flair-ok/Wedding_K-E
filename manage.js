@@ -1,5 +1,5 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyA5H2hOA_D9zlqv0KBQCzcokfBfWS70BCuwFmoxGbF1PKGFzd3eMw_Jmcpf3jYDiHSeg/exec';
-const SECRET_KEY = 'твой_секретный_ключ'; // ← замени на тот же, что в Apps Script
+const SECRET_KEY = '12345'; // ← замени на тот же, что в Apps Script
 
 let guests = [];
 
