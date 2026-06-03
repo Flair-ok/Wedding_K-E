@@ -13,7 +13,7 @@ async function loadGuests() {
     if (Array.isArray(data)) {
       guests = data;
       renderTable();
-      renderSeatingPlan(); // отрисовываем рассадку при каждой загрузке
+      renderSeatingPlan();
     } else {
       console.error('Неверный формат:', data);
     }
@@ -221,7 +221,7 @@ async function addGuest() {
       document.getElementById('newFio').value = '';
       document.getElementById('newTable').value = '';
       document.querySelectorAll('#newDrinksCheck input').forEach(cb => cb.checked = false);
-      await loadGuests(); // обновит и рассадку
+      await loadGuests();
     } else {
       alert(data.message || 'Ошибка при добавлении');
     }
@@ -247,7 +247,7 @@ async function updateGuest(id, row) {
     });
     const data = await resp.json();
     if (data.result === 'success') {
-      await loadGuests(); // обновит рассадку
+      await loadGuests();
     } else {
       alert(data.message || 'Ошибка при обновлении');
     }
@@ -288,7 +288,7 @@ function renderSeatingPlan() {
 
   // Определяем столы
   const tables = [
-    { id: 'rect', label: 'Молодожёны', type: 'rectangle', capacity: 2, number: 1 }, // номер 1 зарезервирован для прямоугольного
+    { id: 'rect', label: 'Молодожёны', type: 'rectangle', capacity: 2, number: 1 },
     { id: 'table2', label: 'Стол 2', type: 'round', capacity: 10, number: 2 },
     { id: 'table3', label: 'Стол 3', type: 'round', capacity: 10, number: 3 },
     { id: 'table4', label: 'Стол 4', type: 'round', capacity: 10, number: 4 },
@@ -304,16 +304,13 @@ function renderSeatingPlan() {
   const unassigned = [];
 
   guests.forEach(guest => {
-    // Ищем номер стола из строки вида "Стол - X"
     const match = (guest.table || '').match(/Стол\s*-\s*(\d+)/);
     if (match) {
       const num = parseInt(match[1]);
-      // Если это 1, помещаем на прямоугольный стол
       if (num === 1) {
         tableGuests['rect'].push(guest);
         return;
       }
-      // Ищем круглый стол с таким номером
       const table = tables.find(t => t.number === num && t.type === 'round');
       if (table) {
         tableGuests[table.id].push(guest);
@@ -325,27 +322,28 @@ function renderSeatingPlan() {
     }
   });
 
-  // Отрисовываем
-  let html = '<div style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">';
+  // Отрисовываем столы
+  let html = '';
   // Прямоугольный стол
   html += renderRectangleTable('rect', tables[0], tableGuests['rect']);
   // Круглые столы
   tables.slice(1).forEach(t => {
     html += renderRoundTable(t, tableGuests[t.id]);
   });
-  html += '</div>';
-  // Неразмещённые гости
-  html += `<div class="unassigned-guests">
-    <h4>Неразмещённые гости (${unassigned.length})</h4>
-    <div class="unassigned-list" id="unassigned-list">`;
-  unassigned.forEach(g => {
-    html += `<div class="unassigned-guest" draggable="true" data-guest-id="${g.id}">${escapeHtml(g.fio)}</div>`;
-  });
-  html += `</div></div>`;
 
   container.innerHTML = html;
 
-  // Делаем неразмещённых гостей перетаскиваемыми
+  // Неразмещённые гости
+  const unassignedContainer = document.createElement('div');
+  unassignedContainer.className = 'unassigned-guests';
+  unassignedContainer.innerHTML = `<h4>Неразмещённые гости (${unassigned.length})</h4>
+    <div class="unassigned-list" id="unassigned-list">`;
+  unassigned.forEach(g => {
+    unassignedContainer.querySelector('.unassigned-list').innerHTML +=
+      `<div class="unassigned-guest" draggable="true" data-guest-id="${g.id}">${escapeHtml(g.fio)}</div>`;
+  });
+  container.appendChild(unassignedContainer);
+
   setupDragAndDrop();
 }
 
@@ -373,19 +371,17 @@ function renderRoundTable(table, guestsList) {
   const slots = [];
   for (let i = 0; i < table.capacity; i++) {
     const guest = guestsList[i] || null;
-    // Позиционирование по кругу зададим позже через JS, пока просто слоты с data-атрибутами
     slots.push(`
       <div class="guest-slot ${guest ? 'occupied' : ''}" 
            data-table-id="${table.id}" data-slot="${i}"
-           style="position: static; margin: 2px;"
            ${guest ? `data-guest-id="${guest.id}" draggable="true"` : ''}>
-        ${guest ? escapeHtml(guest.fio.split(' ')[0]) : 'Свободно'}
+        ${guest ? escapeHtml(guest.fio) : 'Свободно'}
       </div>`);
   }
   return `
     <div class="table-block">
       <h4>${table.label}</h4>
-      <div class="round-table" data-table-id="${table.id}" style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 10px;">
+      <div class="round-table" data-table-id="${table.id}">
         ${slots.join('')}
       </div>
     </div>`;
@@ -393,7 +389,6 @@ function renderRoundTable(table, guestsList) {
 
 // ===================== ПЕРЕТАСКИВАНИЕ ГОСТЕЙ =====================
 function setupDragAndDrop() {
-  // Все элементы с атрибутом draggable="true"
   const draggables = document.querySelectorAll('[draggable="true"]');
   const dropZones = document.querySelectorAll('.guest-slot');
 
@@ -420,7 +415,6 @@ function handleDragStart(e) {
 
 function handleDragEnd(e) {
   this.classList.remove('dragging');
-  // Не сбрасываем draggedGuestId, он понадобится в drop
 }
 
 function handleDragOver(e) {
@@ -442,27 +436,24 @@ async function handleDrop(e) {
 
   if (!draggedGuestId) return;
 
-  // Нельзя бросить на уже занятый слот (если он не тот же гость?)
+  // Если слот уже занят и это не перемещение того же гостя на своё же место
   if (targetSlot.classList.contains('occupied') && targetSlot.dataset.guestId !== draggedGuestId) {
     alert('Это место уже занято.');
     return;
   }
 
-  // Определяем новый стол по ID стола
   let newTableValue = '';
   if (targetTableId === 'rect') {
     newTableValue = 'Стол - 1';
   } else {
-    // Извлекаем номер из ID, например 'table2' -> 2
     const num = targetTableId.replace('table', '');
     newTableValue = `Стол - ${num}`;
   }
 
-  // Обновляем гостя через API
   const body = new URLSearchParams();
   body.append('action', 'update');
   body.append('id', draggedGuestId);
-  body.append('table', newTableValue); // отправляем только изменение стола
+  body.append('table', newTableValue);
 
   try {
     const resp = await fetch(SCRIPT_URL, {
@@ -473,7 +464,7 @@ async function handleDrop(e) {
     });
     const data = await resp.json();
     if (data.result === 'success') {
-      await loadGuests(); // перезагрузит и рассадку
+      await loadGuests();
     } else {
       alert(data.message || 'Не удалось переместить гостя.');
     }
@@ -481,7 +472,6 @@ async function handleDrop(e) {
     alert('Ошибка соединения.');
   }
 
-  // Сбрасываем перетаскиваемого
   document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
   draggedGuestId = null;
 }
