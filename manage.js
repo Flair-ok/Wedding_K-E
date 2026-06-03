@@ -1,8 +1,8 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH1djTYhHYEXelXKH_SVK_GSnnrO0WGkWwsn4fzj4xJbSw91KeOHUbnnNHRbhHHxciLg/exec';
 
 let guests = [];
-let sortColumn = null;   // текущий столбец сортировки
-let sortAsc = true;      // направление сортировки
+let sortColumn = null;   // активный столбец сортировки или null
+let sortAsc = true;      // направление сортировки (по умолчанию не важно, если sortColumn=null)
 
 // ===================== ЗАГРУЗКА ДАННЫХ =====================
 async function loadGuests() {
@@ -40,7 +40,8 @@ function filteredGuests() {
 
 // ===================== СОРТИРОВКА =====================
 function sortGuests(arr) {
-  if (!sortColumn) return arr;
+  if (!sortColumn) return arr; // без сортировки возвращаем как есть
+
   const col = sortColumn;
 
   const getSortValue = (g) => {
@@ -149,16 +150,24 @@ function updateDrinkStats(filtered) {
     <div class="stat-row">${Object.entries(filteredStats).map(([k, v]) => `<span class="stat-item">${k}: ${v}</span>`).join('')}</div>`;
 }
 
-// ===================== ОБРАБОТЧИК СОРТИРОВКИ ПО ЗАГОЛОВКАМ =====================
+// ===================== СОРТИРОВКА ПО ЗАГОЛОВКАМ (три состояния) =====================
 function setupSortListeners() {
   document.querySelectorAll('.sortable').forEach(th => {
     th.addEventListener('click', () => {
       const col = th.dataset.sort;
       if (sortColumn === col) {
-        sortAsc = !sortAsc;   // меняем направление
+        // Уже сортируем по этому столбцу
+        if (sortAsc) {
+          sortAsc = false;   // переключить на убывание
+        } else {
+          // было убывание → отключаем сортировку
+          sortColumn = null;
+          sortAsc = true;
+        }
       } else {
+        // Новый столбец: включаем сортировку по возрастанию
         sortColumn = col;
-        sortAsc = true;       // по умолчанию по возрастанию
+        sortAsc = true;
       }
       renderTable();
     });
@@ -187,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
       renderTable();
     });
   }
-  // Также при обычном изменении селекта
   drinkSelect?.addEventListener('change', renderTable);
 });
 
