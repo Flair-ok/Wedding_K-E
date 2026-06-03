@@ -1,20 +1,22 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyA5H2hOA_D9zlqv0KBQCzcokfBfWS70BCuwFmoxGbF1PKGFzd3eMw_Jmcpf3jYDiHSeg/exec';
+// Вставь скопированный URL сюда
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby70vIv7kmJtzSWtODgKc4gthaw1w51yi8MjNQH87zCLAmL5LGweP7p7tolCj-ZQC5bMQ/exec';
 
 let guests = [];
 
 async function loadGuests() {
   try {
     const resp = await fetch(SCRIPT_URL, { method: 'GET', credentials: 'omit' });
+    if (!resp.ok) throw new Error('Ошибка сети');
     const data = await resp.json();
     if (Array.isArray(data)) {
       guests = data;
       renderTable();
     } else {
-      console.error('Неверный формат:', data);
+      console.error('Ответ не массив:', data);
     }
   } catch (err) {
     console.error('Ошибка загрузки:', err);
-    alert('Не удалось загрузить данные. Проверьте консоль.');
+    alert('Не удалось загрузить данные.');
   }
 }
 
