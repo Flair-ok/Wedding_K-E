@@ -1,6 +1,6 @@
 // ⚠️ Замени на свои значения
 const SECRET_KEY = '12345';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1vvB_fHGMh_SVwJjdH6nhDeUNpWitn4OWxxiyxoITReDuwNn7y7Tgyw9zv3AvynIWHg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRTDkSlOyuAJhEWnJiVLG0LX82WsuWVTuy_kjfa9E9_DqVGcBwaDJ2wfYJTFXl4lqZFA/exec';
 
 let guests = [];
 
