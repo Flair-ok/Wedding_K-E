@@ -26,10 +26,12 @@
                 <option value="30-50">30-50</option>
                 <option value=">50">&gt;50</option>
             </select>
-            <select id="filterDrink">
-                <option value="">Все напитки</option>
-                <!-- Заполняется из JS статическим списком -->
-            </select>
+            <div class="drink-filter-wrap">
+                <select id="filterDrink">
+                    <option value="">Все напитки</option>
+                </select>
+                <button class="btn-reset-drink" id="resetDrinkBtn" title="Сбросить напиток">✕</button>
+            </div>
             <input type="text" id="filterTable" placeholder="Стол (например, 5)">
             <button class="btn" onclick="renderTable()">🔄 Обновить</button>
         </div>
@@ -80,7 +82,12 @@
         <table class="guest-table" id="guestTable">
             <thead>
                 <tr>
-                    <th>ФИО</th><th>Категория</th><th>Напитки</th><th>Возраст</th><th>Стол</th><th>Действия</th>
+                    <th data-sort="fio" class="sortable">ФИО <span class="sort-arrow"></span></th>
+                    <th data-sort="category" class="sortable">Категория <span class="sort-arrow"></span></th>
+                    <th data-sort="drinks" class="sortable">Напитки <span class="sort-arrow"></span></th>
+                    <th data-sort="age" class="sortable">Возраст <span class="sort-arrow"></span></th>
+                    <th data-sort="table" class="sortable">Стол <span class="sort-arrow"></span></th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody></tbody>
