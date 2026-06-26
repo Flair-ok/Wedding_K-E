@@ -295,7 +295,8 @@ function renderSeatingPlan() {
     { id: 'table5', label: 'Стол 5', type: 'round', capacity: 10, number: 5 },
     { id: 'table6', label: 'Стол 6', type: 'round', capacity: 10, number: 6 },
     { id: 'table7', label: 'Стол 7', type: 'round', capacity: 10, number: 7 },
-    { id: 'table8', label: 'Стол 8', type: 'round', capacity: 10, number: 8 }
+    { id: 'table8', label: 'Стол 8', type: 'round', capacity: 10, number: 8 },
+    { id: 'table9', label: 'Стол 9', type: 'round', capacity: 10, number: 9 }
   ];
 
   // Собираем гостей по столам
