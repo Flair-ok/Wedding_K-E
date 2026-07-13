@@ -1,0 +1,372 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cormorant Garamond', serif;
+    background-color: #fdf2f5;
+    background-image: radial-gradient(circle at 20% 30%, #ffeef2 0%, #fdf2f5 80%);
+    color: #4a3b3c;
+    line-height: 1.6;
+    padding: 10px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Декоративные гирлянды по бокам */
+body::before,
+body::after {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 5rem;
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
+    text-shadow: 0 0 15px rgba(180,120,120,0.4);
+    white-space: pre;
+    line-height: 1.8;
+}
+
+body::before {
+    content: "🌸\A 🌿\A 💮\A 🌸";
+    left: 20px;
+}
+
+body::after {
+    content: "💮\A 🌿\A 🌸\A 💮";
+    right: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 30px;
+    box-shadow: 0 20px 50px rgba(180, 139, 139, 0.2);
+    overflow: hidden;
+    border: 1px solid #f0d9da;
+    position: relative;
+    z-index: 1; /* чтобы был над гирляндами */
+}
+
+.container::before,
+.container::after {
+    content: "🌿";
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.2;
+    z-index: 1;
+}
+.container::before { top: 15px; left: 15px; }
+.container::after { bottom: 15px; right: 15px; transform: rotate(180deg); }
+
+/* Hero section */
+.hero {
+    position: relative;
+    height: 60vh;
+    max-height: 700px;
+    background: url('img/backwhiteball.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #3a2e2e;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 250, 250, 0.5);
+    backdrop-filter: blur(1px);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.pre-title {
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    text-transform: none;
+    margin-bottom: 15px;
+    font-weight: 400;
+    color: #3a2e2e;
+    text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 30px rgba(255,255,255,0.6);
+}
+
+.hero h1 {
+    font-family: 'Caveat', cursive;
+    font-size: 5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1;
+    color: #3a2e2e;
+    text-shadow: 0 0 20px rgba(255,255,255,0.95), 0 0 40px rgba(255,255,255,0.7);
+}
+
+.date-location p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+    font-weight: 400;
+    color: #3a2e2e;
+    text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5);
+}
+
+/* Пригласительный текст */
+.invitation-text {
+    padding: 50px 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    max-width: 650px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.invitation-text p:first-child {
+    font-family: 'Caveat', cursive;
+    font-size: 2.8rem;
+    margin-bottom: 20px;
+    color: #c4817c;
+}
+
+/* Форма */
+.form-section {
+    padding: 40px;
+    background: #fffbfc;
+    position: relative;
+    z-index: 2;
+}
+
+.form-section h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 2.8rem;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #6b4b4d;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #5e4b4c;
+    font-family: 'Montserrat', sans-serif;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #eed6d8;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    background: #fff;
+    transition: all 0.3s;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #d4a9ac;
+    box-shadow: 0 0 0 4px rgba(212,169,172,0.2);
+}
+
+/* Радио-кнопки */
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 400;
+    gap: 10px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.radio-label input {
+    display: none;
+}
+
+.radio-custom {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #d4a9ac;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.radio-label input:checked + .radio-custom::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #d4a9ac;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Чекбоксы */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 400;
+    gap: 10px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.checkbox-label input {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #d4a9ac;
+    border-radius: 6px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.checkbox-label input:checked + .checkbox-custom::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background: #d4a9ac;
+    border-radius: 3px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #e2b6b3 0%, #d4a9a5 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 2px;
+    margin-top: 20px;
+    box-shadow: 0 8px 20px rgba(200,150,150,0.3);
+}
+
+button:hover {
+    background: linear-gradient(135deg, #d4a9a5 0%, #c4817c 100%);
+    box-shadow: 0 12px 25px rgba(200,150,150,0.4);
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.success-message {
+    text-align: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.6s ease;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.success-message p {
+    font-size: 1.3rem;
+    color: #6b4b4d;
+}
+
+.extra-guest-block {
+    background: #fff5f6;
+    border: 1px dashed #e2b6b3;
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 15px;
+    margin-bottom: 25px;
+    animation: fadeIn 0.4s ease;
+}
+
+.extra-guest-block h4 {
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+    color: #b17d7a;
+    margin-bottom: 15px;
+}
+
+.design-note {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #b0a0a0;
+    margin-top: 8px;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Медиа-запросы */
+@media (max-width: 600px) {
+    .hero h1 { font-size: 3.5rem; }
+    .hero { max-height: 400px; }
+    .invitation-text, .form-section { padding: 30px 20px; }
+    .radio-group { flex-direction: column; gap: 12px; }
+}
+
+/* Убираем гирлянды на мобильных, чтобы не мешали */
+@media (max-width: 800px) {
+    body::before,
+    body::after {
+        display: none;
+    }
+}
