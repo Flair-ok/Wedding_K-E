@@ -1,10 +1,12 @@
 'use strict';
 
+// Вспомогательная функция: получить список названий столов (включая Стол - 1)
 function getAllTableOptions() {
     const options = ['Стол - 1'];
     return options.concat(tables.map(t => t.name));
 }
 
+// Обновление всех выпадающих списков со столами
 function populateTableSelects() {
     const allOptions = getAllTableOptions();
 
@@ -42,7 +44,8 @@ function populateTableSelects() {
     }
 }
 
-function addTable() {
+// Добавление стола через API
+async function addTable() {
     const newTableName = prompt('Введите название нового стола (например, "Стол - 9"):');
     if (!newTableName || !newTableName.trim()) return;
     const trimmed = newTableName.trim();
@@ -50,14 +53,16 @@ function addTable() {
         alert('Такой стол уже существует или зарезервирован.');
         return;
     }
-    tables.push({ name: trimmed, capacity: 10 });
-    saveTables();
-    populateTableSelects();
-    renderSeatingPlan();
-    renderTable();
+    try {
+        await addTableToSheet(trimmed, 10);   // API-запрос
+        await refreshAll();                  // перезагружаем guests и tables, перерисовываем
+    } catch (err) {
+        alert('Ошибка при добавлении стола.');
+    }
 }
 
-function deleteTable() {
+// Удаление стола через API
+async function deleteTable() {
     const select = document.getElementById('tableActionSelect');
     const tableToDelete = select.value;
     if (!tableToDelete) return alert('Выберите стол для удаления.');
@@ -65,18 +70,16 @@ function deleteTable() {
 
     if (!confirm(`Удалить стол "${tableToDelete}"? Все гости, сидящие за этим столом, будут помечены как "Стол-?".`)) return;
 
-    guests.forEach(g => {
-        if (g.table === tableToDelete) g.table = 'Стол-?';
-    });
-    saveGuests();
-
-    tables = tables.filter(t => t.name !== tableToDelete);
-    saveTables();
-    populateTableSelects();
-    loadData();
+    try {
+        await deleteTableFromSheet(tableToDelete);  // API удаляет стол и обновляет гостей
+        await refreshAll();
+    } catch (err) {
+        alert('Ошибка при удалении стола.');
+    }
 }
 
-function renameTable() {
+// Переименование стола через API
+async function renameTable() {
     const select = document.getElementById('tableActionSelect');
     const oldName = select.value;
     if (!oldName) return alert('Выберите стол для переименования.');
@@ -93,18 +96,16 @@ function renameTable() {
         return;
     }
 
-    guests.forEach(g => {
-        if (g.table === oldName) g.table = trimmed;
-    });
-    saveGuests();
-
-    tableObj.name = trimmed;
-    saveTables();
-    populateTableSelects();
-    loadData();
+    try {
+        await updateTableOnSheet(oldName, trimmed, null);   // null – не меняем capacity
+        await refreshAll();
+    } catch (err) {
+        alert('Ошибка при переименовании стола.');
+    }
 }
 
-function changeTableCapacity() {
+// Изменение вместимости стола через API
+async function changeTableCapacity() {
     const select = document.getElementById('tableActionSelect');
     const tableName = select.value;
     if (!tableName) return alert('Выберите стол для изменения вместимости.');
@@ -116,30 +117,24 @@ function changeTableCapacity() {
 
     if (newCapacity < 1 || newCapacity > 10) return alert('Недопустимое количество мест.');
 
+    // Предупреждение, если гостей больше новой вместимости
     const guestsAtTable = guests.filter(g => g.table === tableName).length;
     if (guestsAtTable > newCapacity) {
         if (!confirm(`За этим столом уже сидят ${guestsAtTable} гостей. Если уменьшить вместимость до ${newCapacity}, лишние гости станут неразмещёнными. Продолжить?`)) return;
-        const guestsToMove = guestsAtTable - newCapacity;
-        let moved = 0;
-        for (let i = guests.length - 1; i >= 0 && moved < guestsToMove; i--) {
-            if (guests[i].table === tableName) {
-                guests[i].table = 'Стол-?';
-                moved++;
-            }
-        }
-        saveGuests();
     }
 
-    tableObj.capacity = newCapacity;
-    saveTables();
-    populateTableSelects();
-    renderSeatingPlan();
-    renderTable();
+    try {
+        await updateTableOnSheet(tableName, null, newCapacity);   // API обновит capacity
+        await refreshAll();
+    } catch (err) {
+        alert('Ошибка при изменении вместимости.');
+    }
 }
 
+// Основная функция обновления данных с сервера
 async function refreshAll() {
-    guests = await loadGuests();
-    tables = await loadTables();
-    renderTable();          // обновит таблицу и рассадку
-    populateTableSelects();
+    guests = await loadGuests();   // загружаем гостей из Google Sheets
+    tables = await loadTables();   // загружаем столы из Google Sheets
+    renderTable();                 // перерисовываем таблицу и рассадку
+    populateTableSelects();        // обновляем выпадающие списки столов
 }
