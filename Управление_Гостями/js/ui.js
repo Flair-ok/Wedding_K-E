@@ -1,10 +1,11 @@
-// Глобальные переменные для сортировки
+'use strict';
+
 let sortColumn = null;
 let sortAsc = true;
 
-// Рендеринг таблицы гостей (без изменений, но добавлена сортировка)
+// Отображение таблицы гостей и рассадки
 function renderTable() {
-    const filtered = filteredGuests(); // из guestManager, но у нас она в этом же файле для простоты
+    const filtered = filteredGuests();
     const sorted = sortGuests(filtered);
     const tbody = document.querySelector('#guestTable tbody');
     const tableNames = ['Стол - 1', ...tables.map(t => t.name)];
@@ -38,7 +39,7 @@ function renderTable() {
     updateDrinkStats(filtered);
     updateDrinkFilter();
     updateSortArrows();
-    renderSeatingPlan();  // ← теперь рассадка обновляется при каждом рендере
+    renderSeatingPlan();   // <-- теперь рассадка обновляется вместе с таблицей
 }
 
 // Сортировка
@@ -76,7 +77,24 @@ function updateSortArrows() {
     });
 }
 
-// Фильтрация и статистика (без изменений)
+// Привязка кликов по заголовкам
+function setupSortListeners() {
+    document.querySelectorAll('.sortable').forEach(th => {
+        th.addEventListener('click', () => {
+            const col = th.dataset.sort;
+            if (sortColumn === col) {
+                if (sortAsc) sortAsc = false;
+                else { sortColumn = null; sortAsc = true; }
+            } else {
+                sortColumn = col;
+                sortAsc = true;
+            }
+            renderTable();
+        });
+    });
+}
+
+// Фильтрация гостей
 function filteredGuests() {
     const cat = document.getElementById('filterCategory').value;
     const age = document.getElementById('filterAge').value;
@@ -91,6 +109,7 @@ function filteredGuests() {
     });
 }
 
+// Фильтр напитков
 function updateDrinkFilter() {
     const allDrinks = new Set();
     guests.forEach(g => g.drinks.split(',').forEach(d => allDrinks.add(d.trim())));
@@ -99,6 +118,7 @@ function updateDrinkFilter() {
     allDrinks.forEach(d => { if(d) { const opt = document.createElement('option'); opt.value = d; opt.textContent = d; select.appendChild(opt); } });
 }
 
+// Статистика напитков
 function updateDrinkStats(filtered) {
     const countDrinks = (arr) => {
         const stats = {};
@@ -120,19 +140,18 @@ function updateDrinkStats(filtered) {
         <div class="stat-row">${Object.entries(filteredStats).map(([k,v])=>`<span class="stat-item">${k}: ${v}</span>`).join('')}</div>`;
 }
 
+// Безопасный вывод текста
 function escapeHtml(str) {
     return String(str).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 }
 
-// ============ РАССАДКА ГОСТЕЙ ============
+// ========== РАССАДКА ГОСТЕЙ ==========
 function renderSeatingPlan() {
     const container = document.getElementById('tables-container');
     if (!container) return;
 
-    // Стол молодожёнов (Стол - 1)
     const rectGuests = guests.filter(g => g.table === 'Стол - 1');
 
-    // Распределение гостей по круглым столам
     const roundTableGuests = {};
     tables.forEach(t => roundTableGuests[t.name] = []);
     const unassigned = [];
@@ -148,16 +167,13 @@ function renderSeatingPlan() {
     });
 
     let html = '';
-    // Прямоугольный стол
     html += renderRectangleTable(rectGuests);
-    // Круглые столы
     tables.forEach(t => {
         html += renderRoundTable(t.name, roundTableGuests[t.name] || [], t.capacity);
     });
 
     container.innerHTML = html;
 
-    // Неразмещённые гости
     const unassignedDiv = document.createElement('div');
     unassignedDiv.className = 'unassigned-guests';
     unassignedDiv.innerHTML = `<h4>Неразмещённые гости (${unassigned.length})</h4>
@@ -211,7 +227,7 @@ function renderRoundTable(tableName, guestsList, capacity) {
         </div>`;
 }
 
-// ============ ПЕРЕТАСКИВАНИЕ ГОСТЕЙ ============
+// ========== ПЕРЕТАСКИВАНИЕ ==========
 let draggedGuestId = null;
 
 function setupDragAndDrop() {
@@ -259,6 +275,7 @@ async function handleDrop(e) {
     const targetSlotIndex = parseInt(targetSlot.dataset.slot);
 
     if (!draggedGuestId) return;
+
     if (targetSlot.classList.contains('occupied') && targetSlot.dataset.guestId !== draggedGuestId) {
         alert('Это место уже занято.');
         return;
@@ -281,10 +298,9 @@ async function handleDrop(e) {
         }
     }
 
-    // Обновляем через API
     try {
         await updateGuestOnSheet(draggedGuestId, { table: newTableValue });
-        await refreshAll();  // перезагрузит guests и tables, вызовет renderTable и renderSeatingPlan
+        await refreshAll();   // перезагружаем всё
     } catch (err) {
         alert('Ошибка при перемещении гостя.');
     }
@@ -293,19 +309,42 @@ async function handleDrop(e) {
     draggedGuestId = null;
 }
 
-// Привязка сортировки (вызывается из app.js)
-function setupSortListeners() {
-    document.querySelectorAll('.sortable').forEach(th => {
-        th.addEventListener('click', () => {
-            const col = th.dataset.sort;
-            if (sortColumn === col) {
-                if (sortAsc) sortAsc = false;
-                else { sortColumn = null; sortAsc = true; }
-            } else {
-                sortColumn = col;
-                sortAsc = true;
-            }
-            renderTable();
-        });
-    });
+// Функции добавления/обновления/удаления гостей (вызываются из HTML)
+async function addGuest() {
+    const fio = document.getElementById('newFio').value.trim();
+    if (!fio) return alert('Введите ФИО');
+    const category = document.getElementById('newCategory').value;
+    const age = document.getElementById('newAge').value;
+    const drinkChecks = [...document.querySelectorAll('#newDrinksCheck input:checked')].map(cb => cb.value).join(', ');
+    const table = document.getElementById('newTable').value;
+
+    try {
+        await addGuestToSheet({ fio, category, age, drinks: drinkChecks, table: table || 'Стол-?' });
+        document.getElementById('newFio').value = '';
+        document.querySelectorAll('#newDrinksCheck input').forEach(cb => cb.checked = false);
+        await refreshAll();
+    } catch (err) {
+        alert('Ошибка при добавлении гостя.');
+    }
+}
+
+async function updateGuest(id, row) {
+    const fields = {};
+    row.querySelectorAll('[data-field]').forEach(el => fields[el.dataset.field] = el.value);
+    try {
+        await updateGuestOnSheet(id, fields);
+        await refreshAll();
+    } catch (err) {
+        alert('Ошибка при обновлении гостя.');
+    }
+}
+
+async function deleteGuest(id) {
+    if (!confirm('Удалить гостя?')) return;
+    try {
+        await deleteGuestFromSheet(id);
+        await refreshAll();
+    } catch (err) {
+        alert('Ошибка при удалении гостя.');
+    }
 }
