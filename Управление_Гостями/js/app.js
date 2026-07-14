@@ -44,3 +44,12 @@ function loadData() {
     renderSeatingPlan();
     populateTableSelects();
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await refreshAll();
+    setupSortListeners();   // <-- добавь эту строку
+    document.getElementById('filterCategory').addEventListener('change', renderTable);
+    document.getElementById('filterAge').addEventListener('change', renderTable);
+    document.getElementById('filterDrink').addEventListener('change', renderTable);
+    document.getElementById('filterTable').addEventListener('change', renderTable);
+});
