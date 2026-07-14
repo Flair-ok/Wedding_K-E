@@ -136,3 +136,10 @@ function changeTableCapacity() {
     renderSeatingPlan();
     renderTable();
 }
+
+async function refreshAll() {
+    guests = await loadGuests();
+    tables = await loadTables();
+    renderTable();          // обновит таблицу и рассадку
+    populateTableSelects();
+}
