@@ -106,7 +106,6 @@ function renderTable() {
   }).join('');
 
   updateDrinkStats(filtered);
-  fillDrinkFilter();
   updateSortArrows();
 }
 
@@ -114,10 +113,12 @@ function escapeHtml(str) {
   return String(str).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 }
 
-// ===================== СТАТИЧЕСКИЙ ФИЛЬТР НАПИТКОВ =====================
+// ===================== СТАТИЧЕСКИЙ ФИЛЬТР НАПИТКОВ (заполняется один раз) =====================
 function fillDrinkFilter() {
   const allDrinks = ['Не пью', 'Сок', 'Лимонад', 'Вино', 'Шампанское', 'Водка', 'Коньяк', 'Самогон'];
   const select = document.getElementById('filterDrink');
+  // Сохраняем текущее значение, чтобы не сбросить выбор
+  const currentValue = select.value;
   select.innerHTML = '<option value="">Все напитки</option>';
   allDrinks.forEach(d => {
     const opt = document.createElement('option');
@@ -125,6 +126,10 @@ function fillDrinkFilter() {
     opt.textContent = d;
     select.appendChild(opt);
   });
+  // Восстанавливаем значение, если оно есть среди опций
+  if (currentValue && [...select.options].some(o => o.value === currentValue)) {
+    select.value = currentValue;
+  }
 }
 
 // ===================== КАЛЬКУЛЯТОР НАПИТКОВ =====================
@@ -178,14 +183,6 @@ function updateSortArrows() {
     }
   });
 }
-
-// ===================== СБРОС ФИЛЬТРА НАПИТКОВ =====================
-document.addEventListener('DOMContentLoaded', function() {
-  const drinkSelect = document.getElementById('filterDrink');
-  drinkSelect?.addEventListener('change', renderTable);
-  // При изменении селекта, если выбрано "Все напитки" (value=""),
-  // фильтр автоматически очищается благодаря логике filteredGuests
-});
 
 // ===================== ДОБАВЛЕНИЕ ГОСТЯ =====================
 async function addGuest() {
@@ -281,7 +278,6 @@ function renderSeatingPlan() {
   const container = document.getElementById('tables-container');
   if (!container) return;
 
-  // Определяем столы
   const tables = [
     { id: 'rect', label: 'Молодожёны', type: 'rectangle', capacity: 2, number: 1 },
     { id: 'table2', label: 'Стол 2', type: 'round', capacity: 10, number: 2 },
@@ -294,7 +290,6 @@ function renderSeatingPlan() {
     { id: 'table9', label: 'Стол 9', type: 'round', capacity: 10, number: 9 }
   ];
 
-  // Собираем гостей по столам
   const tableGuests = {};
   tables.forEach(t => tableGuests[t.id] = []);
   const unassigned = [];
@@ -318,18 +313,14 @@ function renderSeatingPlan() {
     }
   });
 
-  // Отрисовываем столы
   let html = '';
-  // Прямоугольный стол
   html += renderRectangleTable('rect', tables[0], tableGuests['rect']);
-  // Круглые столы
   tables.slice(1).forEach(t => {
     html += renderRoundTable(t, tableGuests[t.id]);
   });
 
   container.innerHTML = html;
 
-  // Неразмещённые гости
   const unassignedContainer = document.createElement('div');
   unassignedContainer.className = 'unassigned-guests';
   unassignedContainer.innerHTML = `<h4>Неразмещённые гости (${unassigned.length})</h4>
@@ -432,7 +423,6 @@ async function handleDrop(e) {
 
   if (!draggedGuestId) return;
 
-  // Если слот уже занят и это не перемещение того же гостя на своё же место
   if (targetSlot.classList.contains('occupied') && targetSlot.dataset.guestId !== draggedGuestId) {
     alert('Это место уже занято.');
     return;
@@ -474,9 +464,15 @@ async function handleDrop(e) {
 
 // ===================== ИНИЦИАЛИЗАЦИЯ =====================
 (async function init() {
+  // Заполняем фильтр напитков один раз
+  fillDrinkFilter();
+  // Загружаем данные
   await loadGuests();
   setupSortListeners();
+  // Обработчики фильтров
   document.getElementById('filterCategory').addEventListener('change', renderTable);
   document.getElementById('filterAge').addEventListener('change', renderTable);
   document.getElementById('filterTable').addEventListener('input', renderTable);
+  const drinkSelect = document.getElementById('filterDrink');
+  drinkSelect?.addEventListener('change', renderTable);
 })();
