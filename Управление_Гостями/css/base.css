@@ -169,3 +169,86 @@ h1 {
 .guest-table td:nth-child(5) { min-width: 100px; } /* Стол */
 .guest-table th:nth-child(6),
 .guest-table td:nth-child(6) { min-width: 70px; }  /* Действия */
+
+/* Сортировка */
+.sortable { cursor: pointer; }
+.sortable:hover { color: #b17d7a; }
+.sort-arrow { font-size: 0.8rem; margin-left: 5px; }
+
+/* Обёртка для горизонтальной прокрутки таблицы */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+}
+
+/* Рассадка */
+#seating-plan {
+    margin-top: 30px;
+    background: white; border-radius: 20px; padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+#seating-plan h3 { color: #b17d7a; margin-bottom: 20px; }
+
+#tables-container {
+    display: flex; flex-wrap: wrap; gap: 50px; justify-content: center;
+}
+
+.table-block {
+    background: #f9e7e7; border-radius: 20px; padding: 25px;
+    flex: 0 1 560px;
+    margin-bottom: 10px;
+}
+.table-block h4 {
+    text-align: center; color: #b17d7a; margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+.rect-table {
+    border: 2px solid #b17d7a;
+    background: white;
+    min-height: 70px; display: flex; flex-direction: column; gap: 8px;
+    padding: 10px; border-radius: 10px;
+}
+.round-table {
+    border: 2px solid #b17d7a; border-radius: 50%;
+    background: white;
+    width: 400px; height: 400px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    padding: 35px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.guest-slot {
+    background: #f0e0e0; border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px dashed #d4a9ac;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 190px;
+    line-height: 1.2;
+}
+.guest-slot.occupied {
+    background: #b17d7a; color: white; border: none;
+}
+.guest-slot.drag-over {
+    border: 2px dashed #fff;
+}
+
+.unassigned-guests {
+    background: #f9e7e7; border-radius: 20px; padding: 15px;
+    flex-basis: 100%;
+    margin-top: 20px;
+}
+.unassigned-guests h4 { color: #b17d7a; margin-bottom: 10px; }
+.unassigned-list {
+    display: flex; flex-wrap: wrap; gap: 10px;
+}
+.unassigned-guest {
+    background: #d4a9a5; padding: 6px 12px; border-radius: 15px;
+    cursor: grab; font-size: 0.9rem; color: white;
+}
+.unassigned-guest.dragging { opacity: 0.5; }
