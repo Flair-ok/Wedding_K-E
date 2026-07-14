@@ -181,15 +181,10 @@ function updateSortArrows() {
 
 // ===================== СБРОС ФИЛЬТРА НАПИТКОВ =====================
 document.addEventListener('DOMContentLoaded', function() {
-  const resetBtn = document.getElementById('resetDrinkBtn');
   const drinkSelect = document.getElementById('filterDrink');
-  if (resetBtn && drinkSelect) {
-    resetBtn.addEventListener('click', function() {
-      drinkSelect.value = '';
-      renderTable();
-    });
-  }
   drinkSelect?.addEventListener('change', renderTable);
+  // При изменении селекта, если выбрано "Все напитки" (value=""),
+  // фильтр автоматически очищается благодаря логике filteredGuests
 });
 
 // ===================== ДОБАВЛЕНИЕ ГОСТЯ =====================
