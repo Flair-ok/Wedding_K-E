@@ -204,3 +204,38 @@ h1 {
     cursor: grab; font-size: 0.9rem;
 }
 .unassigned-guest.dragging { opacity: 0.5; }
+
+/* Адаптивная обёртка для таблицы */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .form-row label {
+        width: auto;
+        text-align: left;
+    }
+    .btn-add {
+        margin-left: 0;
+        width: 100%;
+    }
+    /* Скрываем колонки Категория и Возраст на маленьких экранах */
+    .guest-table th:nth-child(2),
+    .guest-table td:nth-child(2),
+    .guest-table th:nth-child(4),
+    .guest-table td:nth-child(4) {
+        display: none;
+    }
+}
