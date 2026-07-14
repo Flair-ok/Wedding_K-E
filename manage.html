@@ -26,12 +26,9 @@
                 <option value="30-50">30-50</option>
                 <option value=">50">&gt;50</option>
             </select>
-            <div class="drink-filter-wrap">
-                <select id="filterDrink">
-                    <option value="">Все напитки</option>
-                </select>
-                <button class="btn-reset-drink" id="resetDrinkBtn" title="Сбросить напиток">✕</button>
-            </div>
+            <select id="filterDrink">
+                <option value="">Все напитки</option>
+            </select>
             <input type="text" id="filterTable" placeholder="Стол (например, 5)">
         </div>
 
@@ -78,19 +75,22 @@
             </div>
         </div>
 
-        <table class="guest-table" id="guestTable">
-            <thead>
-                <tr>
-                    <th data-sort="fio" class="sortable">ФИО <span class="sort-arrow"></span></th>
-                    <th data-sort="category" class="sortable">Категория <span class="sort-arrow"></span></th>
-                    <th data-sort="drinks" class="sortable">Напитки <span class="sort-arrow"></span></th>
-                    <th data-sort="age" class="sortable">Возраст <span class="sort-arrow"></span></th>
-                    <th data-sort="table" class="sortable">Стол <span class="sort-arrow"></span></th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <!-- Оборачиваем таблицу для горизонтальной прокрутки -->
+        <div class="table-wrapper">
+            <table class="guest-table" id="guestTable">
+                <thead>
+                    <tr>
+                        <th data-sort="fio" class="sortable">ФИО <span class="sort-arrow"></span></th>
+                        <th data-sort="category" class="sortable">Категория <span class="sort-arrow"></span></th>
+                        <th data-sort="drinks" class="sortable">Напитки <span class="sort-arrow"></span></th>
+                        <th data-sort="age" class="sortable">Возраст <span class="sort-arrow"></span></th>
+                        <th data-sort="table" class="sortable">Стол <span class="sort-arrow"></span></th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
         <div class="drink-stats" id="drinkStats"></div>
 
