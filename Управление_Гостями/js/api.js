@@ -1,5 +1,5 @@
 const SECRET_KEY = '12345';
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxrL11Es8MKs-8WD2X7Wplk_JjzJuZDnrJUkMAWBue30h1z9vPqqEkmwQrpDhIH2utMHA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXllaBgj8MjCNXRj31MWIj9oAgPWthsfDm5kriqsL-X8YwmKdY4uxABytyZaGmVbNpSw/exec';
 
 // Универсальная функция для GET-запроса
 async function fetchData(action, params = {}) {
