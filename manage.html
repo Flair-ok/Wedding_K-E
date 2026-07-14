@@ -12,6 +12,13 @@
         <h1>🌸 Гости (управление) 🌸</h1>
         <p class="subtitle">Ксения & Егор • 25 июля 2026</p>
 
+        <!-- Кнопка перехода к Google Таблицам -->
+        <div class="google-sheets-link">
+            <a href="https://docs.google.com/spreadsheets/d/ТВОЙ_ID_ТАБЛИЦЫ/edit" target="_blank" class="btn-google-sheets">
+                📊 Открыть Google Таблицу
+            </a>
+        </div>
+
         <div class="controls">
             <select id="filterCategory">
                 <option value="">Все категории</option>
@@ -75,7 +82,7 @@
             </div>
         </div>
 
-        <!-- Оборачиваем таблицу для горизонтальной прокрутки -->
+        <!-- Таблица гостей с обёрткой для прокрутки -->
         <div class="table-wrapper">
             <table class="guest-table" id="guestTable">
                 <thead>
